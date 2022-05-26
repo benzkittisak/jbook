@@ -7,18 +7,13 @@
  * [*]   เก็บข้อมูลของ pkg ที่เคยเรียกใช้งานไว้ก่อนหน้าแล้วไว้เพื่อเพิ่มประสิทธิภาพ ถ้ายังไม่เคยเรียกให้เรียกใช้งานก่อน
  *      แล้วก็ค่อยเอามาเก็บไว้ใน cache => indexedDB (localforage)
  * []   รองรับ css
+ * 
+ * แยกส่วนของการ fetch ข้อมูลไปไฟล์ fetch-plugin
  */
 
 import * as esbuild from "esbuild-wasm";
-import axios from "axios";
-import localForage from "localforage";
 
-// initial localForage
-const fileCache = localForage.createInstance({
-  name: "filecache",
-});
-
-export const unpkgPathPlugin = (inputCode: string) => {
+export const unpkgPathPlugin = () => {
   return {
     name: "unpkg-path-plugin",
     setup(build: esbuild.PluginBuild) {
@@ -48,43 +43,6 @@ export const unpkgPathPlugin = (inputCode: string) => {
       build.onResolve({ filter: /.*/ }, async (args: any) => {
         return { path: `https://unpkg.com/${args.path}`, namespace: "a" };
       });
-
-      build.onLoad({ filter: /.*/ }, async (args: any) => {
-        console.log("onLoad", args);
-
-        if (args.path === "index.js") {
-          return {
-            loader: "jsx",
-            // ปัญหาคือตอนนี้ตัว unpkg ไม่รู้ว่าต้องไปโหลด tiny-path-pkg มาได้ยังไง
-            // แก้ตัว onResolve ใหม่นิดหน่อย
-            contents: inputCode,
-          };
-        }
-
-        // ตรวจสอบว่ามีการ fetch ข้อมูลของ pkg นี้แล้วหรือยัง
-        const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
-          args.path
-        );
-        // ถ้ามันมีแล้วใน cache
-        if (cachedResult) {
-          return cachedResult;
-        }
-
-        // แก้ปัญหาเรื่องโหลด pkg
-        const { data, request } = await axios.get(args.path);
-
-        const result: esbuild.OnLoadResult = {
-          loader: "jsx",
-          contents: data,
-          // แก้ปัญหาข้อ 3
-          resolveDir: new URL("./", request.responseURL).pathname,
-        };
-
-        // เก็บข้อมูลไว้ใน cache
-        // ใช้ args.path เป็น key เพราะว่ามัน unique อยู่แล้ว
-        await fileCache.setItem(args.path, result);
-        return result;
-      });
-    },
-  };
+    }
+  }
 };
