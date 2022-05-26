@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as esbuild from "esbuild-wasm";
 
-import { unpkgPathPlugin } from './plugins/unpkg.plugin';
+import { unpkgPathPlugin } from "./plugins/unpkg.plugin";
 
 const App: React.FC = () => {
   const ref = useRef<any>();
@@ -24,14 +24,18 @@ const App: React.FC = () => {
   const onClick = async () => {
     if (!ref.current) return;
     const result = await ref.current.build({
-      entryPoints:['index.js'],
-      bundle:true,
-      write:false,
-      plugins:[unpkgPathPlugin()]
+      entryPoints: ["index.js"],
+      bundle: true,
+      write: false,
+      plugins: [unpkgPathPlugin()],
+      define: {
+        "process.env.NODE_ENV": '"production"',
+        global: "window",
+      },
     });
 
     // console.log(result);
-  
+
     setCode(result.outputFiles[0].text);
   };
 
