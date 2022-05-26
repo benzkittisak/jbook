@@ -3,6 +3,7 @@
  * [*] ปัญหาเรื่องการโหลด pkg มาตัว plugin ยังไม่รู้ว่ามันต้องทำยังไง
  * [*] ปัญหาเรื่องถ้ามีการ import หรือ require pkg มาภายใน code มันจะต้องทำยังไง ซึ่งบางที
  *    path ของมันก็เป็น ../ หรือ ./ แต่เราต้องการเป็น /<ชื่อ pkg> (Relative path)
+ * [*] ปัญหาเรื่องถ้าใน pkg มันต้องการ pkg อื่นที่อยู่ในโฟลเดอร์มันจะไม่สามารถไปดึง pkg มาได้
  */
 
 import * as esbuild from "esbuild-wasm";
@@ -34,7 +35,11 @@ export const unpkgPathPlugin = () => {
         // แก้ปัญหาเรื่อง Relative path
         if (args.path.includes("./") || args.path.includes("../")) {
           return {
-            path: new URL(args.path, args.importer + "/").href,
+            //  แก้ปัญหาข้อ 3
+            path: new URL(
+              args.path,
+              "https://unpkg.com" + args.resolveDir + "/"
+            ).href,
             namespace: "a",
           };
         }
@@ -51,17 +56,21 @@ export const unpkgPathPlugin = () => {
             // ปัญหาคือตอนนี้ตัว unpkg ไม่รู้ว่าต้องไปโหลด tiny-path-pkg มาได้ยังไง
             // แก้ตัว onResolve ใหม่นิดหน่อย
             contents: `
-              const message = require('medium-test-pkg');
+              const message = require('nested-test-pkg');
               console.log(message);
             `,
           };
         }
 
         // แก้ปัญหาเรื่องโหลด pkg
-        const { data } = await axios.get(args.path);
+        const { data, request } = await axios.get(args.path);
+        console.log(request);
+
         return {
           loader: "jsx",
           contents: data,
+          // แก้ปัญหาข้อ 3
+          resolveDir: new URL("./", request.responseURL).pathname,
         };
       });
     },
