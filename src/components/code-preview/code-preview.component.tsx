@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-import './code-preview.style.scss';
+import "./code-preview.style.scss";
 
 interface CodePreviewProps {
   code: string;
@@ -8,7 +8,11 @@ interface CodePreviewProps {
 
 const html = `
   <html>
-        <head></head>
+        <head>
+          <style>
+            html {background-color:white;}
+          </style>
+        </head>
         <body>
           <div id="root"></div>
           <script>
@@ -38,11 +42,11 @@ const CodePreview: React.FC<CodePreviewProps> = ({ code }) => {
   return (
     <div className="preview-wrapper">
       <iframe
-      title="Code Preview"
-      ref={iframe}
-      sandbox="allow-scripts"
-      srcDoc={html}
-    />
+        title="Code Preview"
+        ref={iframe}
+        sandbox="allow-scripts"
+        srcDoc={html}
+      />
     </div>
   );
 };
