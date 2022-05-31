@@ -6,6 +6,7 @@ import { fetchPlugin } from "./plugins/fetch-plugin";
 
 const App: React.FC = () => {
   const ref = useRef<any>();
+  const iframe = useRef<any>();
   const [input, setInput] = useState("");
 
   // output from esbuild
@@ -35,7 +36,9 @@ const App: React.FC = () => {
       },
     });
 
-    setCode(result.outputFiles[0].text);
+    // setCode(result.outputFiles[0].text);
+    // ส่ง code ไปที่ iframe 
+    iframe.current.contentWindow.postMessage(result.outputFiles[0].text , '*');
   };
 
   const html = `
@@ -45,7 +48,7 @@ const App: React.FC = () => {
           <div id="root"></div>
           <script>
             window.addEventListener('message', (event) => {
-              console.log(event.data);
+              eval(event.data);
             } , false)
           </script>
         </body>
@@ -69,10 +72,11 @@ const App: React.FC = () => {
       </div>
       <pre ref={ref}>{code}</pre>
       <iframe
+        ref={iframe}
         sandbox="allow-scripts"
         srcDoc={html}
         title="preview code"
-        src="/test.html"
+        src="/preview.html"
         frameBorder="1"
       ></iframe>
     </>
