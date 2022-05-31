@@ -3,6 +3,7 @@ import * as esbuild from "esbuild-wasm";
 
 import { unpkgPathPlugin } from "./plugins/unpkg.plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
+import CodeEditor from "./components/code-editor/code-editor.component";
 
 const App: React.FC = () => {
   const ref = useRef<any>();
@@ -25,6 +26,7 @@ const App: React.FC = () => {
 
   const onClick = async () => {
     if (!ref.current) return;
+    iframe.current.srcdoc = html;
     const result = await ref.current.build({
       entryPoints: ["index.js"],
       bundle: true,
@@ -37,8 +39,8 @@ const App: React.FC = () => {
     });
 
     // setCode(result.outputFiles[0].text);
-    // ส่ง code ไปที่ iframe 
-    iframe.current.contentWindow.postMessage(result.outputFiles[0].text , '*');
+    // ส่ง code ไปที่ iframe
+    iframe.current.contentWindow.postMessage(result.outputFiles[0].text, "*");
   };
 
   const html = `
@@ -48,7 +50,13 @@ const App: React.FC = () => {
           <div id="root"></div>
           <script>
             window.addEventListener('message', (event) => {
-              eval(event.data);
+              try{
+                eval(event.data);
+              }catch(error){
+                const root = document.querySelector('#root');
+                root.innerHTML = '<div style="color:red;"><h4>Rumtime Error!</h4>' + error + '</div>';
+                console.error(error);
+              }
             } , false)
           </script>
         </body>
@@ -57,6 +65,10 @@ const App: React.FC = () => {
 
   return (
     <>
+      <CodeEditor
+        initialValue="const helloWorld = 'Hello World';"
+        onChange={(value) => setInput(value)}
+      />
       <textarea
         value={input}
         cols={80}
