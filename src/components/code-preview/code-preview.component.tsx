@@ -4,6 +4,7 @@ import "./code-preview.style.scss";
 
 interface CodePreviewProps {
   code: string;
+  bundlingStatus?:string;
 }
 
 const html = `
@@ -16,13 +17,23 @@ const html = `
         <body>
           <div id="root"></div>
           <script>
+            const handleError = error => {
+              const root = document.querySelector('#root');
+              root.innerHTML = '<div style="color:red;"><h4>Rumtime Error!</h4>' + error + '</div>';
+              console.error(error);
+            }
+
+            window.addEventListener('error' , event=>{
+              event.preventDefault();
+             handleError(event.error);
+            });
+
+
             window.addEventListener('message', (event) => {
               try{
                 eval(event.data);
               }catch(error){
-                const root = document.querySelector('#root');
-                root.innerHTML = '<div style="color:red;"><h4>Rumtime Error!</h4>' + error + '</div>';
-                console.error(error);
+                handleError(error);
               }
             } , false)
           </script>
@@ -30,14 +41,17 @@ const html = `
   </html>
   `;
 
-const CodePreview: React.FC<CodePreviewProps> = ({ code }) => {
+const CodePreview: React.FC<CodePreviewProps> = ({ code , bundlingStatus }) => {
   const iframe = useRef<any>();
 
   useEffect(() => {
     iframe.current.srcdoc = html;
     // ส่ง code ไปที่ iframe
-    iframe.current.contentWindow.postMessage(code, "*");
-  }, [code]);
+
+    setTimeout(() => {
+      iframe.current.contentWindow.postMessage(code, "*");
+    }, 100);
+  }, [code]);  
 
   return (
     <div className="preview-wrapper">
@@ -47,6 +61,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ code }) => {
         sandbox="allow-scripts"
         srcDoc={html}
       />
+      {bundlingStatus && <div className="preview-error">{bundlingStatus}</div>}
     </div>
   );
 };

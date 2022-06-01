@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import bundler from "../../bundler";
 
@@ -8,14 +8,17 @@ import Resizable from "../resizable/resizable.component";
 
 const CodeCell: React.FC = () => {
   const [input, setInput] = useState("");
-
+  const [error , setError] = useState("");
   // output from esbuild
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>("");
 
-  const onClick = async () => {
-    const output = await bundler(input);
-    setCode(output);
-  };
+  useEffect(() => {
+    setTimeout(async () => {
+      const output = await bundler(input);
+      setCode(output?.code as string);
+      setError(output?.err as string);
+    }, 1000);
+  }, [input]);
 
   return (
     <Resizable direction="vertical">
@@ -26,7 +29,7 @@ const CodeCell: React.FC = () => {
             onChange={(value) => setInput(value)}
           />
         </Resizable>
-        <CodePreview code={code} />
+        <CodePreview code={code} bundlingStatus={error}/>
       </div>
     </Resizable>
   );
