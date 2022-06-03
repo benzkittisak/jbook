@@ -1,18 +1,27 @@
 import { Cell } from "../../redux";
+import ActionBar from "../action-bar/action-bar.component";
+
 import CodeCell from "../code-cell/code-cell.component";
 import TextEditor from "../text-editor/text-editor.component";
+
+import "./cell-list-item.style.scss";
 
 interface CellListItemProps {
   cell: Cell;
 }
 
 const CellListItem: React.FC<CellListItemProps> = ({ cell }) => {
-    let child:JSX.Element;
+  let child: JSX.Element;
 
-    if(cell.type === 'code') child = <CodeCell cell={cell}/>
-    else child = <TextEditor cell={cell}/>
+  if (cell.type === "code") child = <CodeCell cell={cell} />;
+  else child = <TextEditor cell={cell} />;
 
-    return (<div>{child}</div>);
+  return (
+    <div className="cell-list-item">
+      {child}
+      <ActionBar id={cell.id} />
+    </div>
+  );
 };
 
 export default CellListItem;
