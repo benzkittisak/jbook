@@ -1,7 +1,6 @@
 import { ActionType } from "../action-types";
 import { CellDirection, CellTypes } from "../cell.interface";
 import {
-  Action,
   UpdateCellAction,
   DeleteCellAction,
   MoveCellAction,

@@ -6,30 +6,42 @@ import CodeEditor from "../code-editor/code-editor.component";
 import CodePreview from "../code-preview/code-preview.component";
 import Resizable from "../resizable/resizable.component";
 
-const CodeCell: React.FC = () => {
-  const [input, setInput] = useState("");
-  const [error , setError] = useState("");
-  // output from esbuild
+import { Cell } from "../../redux";
+import { useActions } from "../../hooks/use-actions";
+
+interface CodeCellProps {
+  cell: Cell;
+}
+
+const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
+  const { updateCell } = useActions();
+  // const [input, setInput] = useState("");
+  const [error, setError] = useState("");
+  // // output from esbuild
   const [code, setCode] = useState<string>("");
 
   useEffect(() => {
-    setTimeout(async () => {
-      const output = await bundler(input);
+     const timer =  setTimeout(async () => {
+      const output = await bundler(cell.content);
       setCode(output?.code as string);
       setError(output?.err as string);
-    }, 1000);
-  }, [input]);
+    }, 750);
+
+    return () => {
+      clearTimeout(timer);
+    }
+  }, [cell.content]);
 
   return (
     <Resizable direction="vertical">
       <div style={{ height: "100%", display: "flex", flexDirection: "row" }}>
         <Resizable direction="horizontal">
           <CodeEditor
-            initialValue={`const helloWorld = 'Hello World';`}
-            onChange={(value) => setInput(value)}
+            initialValue={cell.content}
+            onChange={(value) => updateCell(cell.id , value)}
           />
         </Resizable>
-        <CodePreview code={code} bundlingStatus={error}/>
+        <CodePreview code={code} bundlingStatus={error} />
       </div>
     </Resizable>
   );
