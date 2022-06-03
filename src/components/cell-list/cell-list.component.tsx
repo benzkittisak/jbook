@@ -19,7 +19,8 @@ const CellList: React.FC = () => {
 
   return (
     <div>
-      {renderedCells} <AddCell nextCellId={null} />
+      {renderedCells}
+      <AddCell nextCellId={null} forceVisible={cells?.length === 0} />
     </div>
   );
 };

@@ -6,6 +6,10 @@
     opacity: 1;
   }
 
+  &.force-visible {
+    opacity: 1 !important;
+  }
+
   &-buttons {
     display: flex;
     justify-content: center;
