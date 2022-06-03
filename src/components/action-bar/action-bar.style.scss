@@ -3,4 +3,10 @@
     top: 0;
     z-index: 20;
     right: 0;
+    opacity: 0.25;
+    transition: opacity 0.3s;
+
+    &:hover{
+        opacity: 1;
+    }
 }
