@@ -42,8 +42,8 @@ export interface BundleCompleteAction {
   payload: {
     cellId: string;
     bundle: {
-      code: string;
-      err: string;
+      code: string | undefined;
+      err: string | undefined;
     };
   };
 }

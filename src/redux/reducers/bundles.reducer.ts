@@ -6,8 +6,8 @@ import { Action } from "../actions";
 interface BundleState {
   [key: string]: {
     loading: boolean;
-    code: string;
-    err: string;
+    code: string | undefined;
+    err: string | undefined;
   };
 }
 
