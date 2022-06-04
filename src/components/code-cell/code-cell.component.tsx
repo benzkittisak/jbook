@@ -8,14 +8,14 @@ import Resizable from "../resizable/resizable.component";
 
 import { Cell } from "../../redux";
 import { useActions } from "../../hooks/use-actions";
-import { useTypedSelector } from '../../hooks';
+import { useTypedSelector } from "../../hooks";
 
 interface CodeCellProps {
   cell: Cell;
 }
 
 const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
-  const { updateCell , createBundle } = useActions();
+  const { updateCell, createBundle } = useActions();
 
   // const [input, setInput] = useState("");
   // const [error, setError] = useState("");
@@ -23,37 +23,53 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // const [code, setCode] = useState<string>("");
 
   // Use Redux
-  const bundle = useTypedSelector((state) => state.bundles && state.bundles[cell.id]);
+  const bundle = useTypedSelector(
+    (state) => state.bundles && state.bundles[cell.id]
+  );
   // console.log(bundle);
-  
 
   useEffect(() => {
-     const timer =  setTimeout(async () => {
+    if (!bundle) {
+      createBundle(cell.id, cell.content);
+      return;
+    }
+    const timer = setTimeout(async () => {
       // const output = await bundler(cell.content);
       // setCode(output?.code as string);
       // setError(output?.err as string);
 
       // Use Redux
-      createBundle(cell.id , cell.content);
-      console.log(123);
-      
+      createBundle(cell.id, cell.content);
     }, 750);
 
     return () => {
       clearTimeout(timer);
-    }
-  }, [cell.content , cell.id , createBundle]);
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cell.content, cell.id, createBundle]);
 
   return (
     <Resizable direction="vertical">
-      <div style={{ height: "calc(100% - 10px)", display: "flex", flexDirection: "row" }}>
+      <div
+        style={{
+          height: "calc(100% - 10px)",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Resizable direction="horizontal">
           <CodeEditor
             initialValue={cell.content}
-            onChange={(value) => updateCell(cell.id , value)}
+            onChange={(value) => updateCell(cell.id, value)}
           />
         </Resizable>
-      {bundle && <CodePreview code={bundle.code && bundle.code} bundlingStatus={bundle.err} />}
+        {bundle && (
+          <CodePreview
+            code={bundle.code && bundle.code}
+            bundlingStatus={bundle.err}
+          />
+        )}
       </div>
     </Resizable>
   );
