@@ -39,7 +39,13 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
       (id: string) => data && data[id]
     );
 
-    const cumulativeCode = [];
+    const cumulativeCode = [
+      `
+        const show = (value) => {
+          document.querySelector('#root').innerHTML = value;
+        }
+      `
+    ];
 
     if (orderedCells) {
       for (let c of orderedCells) {
