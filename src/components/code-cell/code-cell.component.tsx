@@ -8,8 +8,7 @@ import Resizable from "../resizable/resizable.component";
 import ProgressBar from "../progress/progress-bar.component";
 
 import { Cell } from "../../redux";
-import { useActions } from "../../hooks/use-actions";
-import { useTypedSelector } from "../../hooks";
+import { useTypedSelector , useActions , useCumulativeCode } from "../../hooks";
 
 import "./code-cell.style.scss";
 
@@ -29,54 +28,13 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   const bundle = useTypedSelector(
     (state) => state.bundles && state.bundles[cell.id]
   );
+
+  const cumulativeCode = useCumulativeCode(cell.id);
   // console.log(bundle);
-
-  // Cumulative Code
-  const cumulativeCode = useTypedSelector((state) => {
-    const { data, order } = state.cells || {};
-
-    const orderedCells = order && order.map((id: string) => data && data[id]);
-
-    const showFunc = `
-    import _React from 'react';
-    import _ReactDOM from 'react-dom';
-    var show = (value) => {
-      const root =  document.querySelector('#root');
-      if(typeof value === 'object'){
-        if(value.$$typeof && value.props){
-          _ReactDOM.render(value ,root)
-        } else {
-         root.innerHTML = JSON.stringify(value , null , 4);
-        }
-      } else {
-        root.innerHTML = value;
-      }
-    }
-  `;
-
-  const showFuncNoop = 'var show = () => {}';
-
-    const cumulativeCode = [];
-
-    if (orderedCells) {
-      for (let c of orderedCells) {
-        if (c && c.type === "code") {
-          if(c.id === cell.id){
-            cumulativeCode.push(showFunc)
-          } else {
-            cumulativeCode.push(showFuncNoop);
-          }
-          cumulativeCode.push(c.content);
-        }
-        if (c && c.id === cell.id) break;
-      }
-    }
-    return cumulativeCode;
-  });
 
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cumulativeCode.join("\n"));
+      createBundle(cell.id, cumulativeCode);
       return;
     }
     const timer = setTimeout(async () => {
@@ -85,7 +43,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
       // setError(output?.err as string);
 
       // Use Redux
-      createBundle(cell.id, cumulativeCode.join("\n"));
+      createBundle(cell.id, cumulativeCode);
     }, 750);
 
     return () => {
@@ -93,7 +51,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cumulativeCode.join("\n"), cell.id, createBundle]);
+  }, [cumulativeCode, cell.id, createBundle]);
 
   return (
     <Resizable direction="vertical">
