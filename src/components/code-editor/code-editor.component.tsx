@@ -2,9 +2,6 @@ import { useRef } from "react";
 import MonacoEditor, { OnMount } from "@monaco-editor/react";
 import prettier from "prettier";
 import parser from "prettier/parser-babel";
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
-import MonacoJSXHighlighter from "monaco-jsx-highlighter";
 
 import "./code-editor.style.scss";
 
