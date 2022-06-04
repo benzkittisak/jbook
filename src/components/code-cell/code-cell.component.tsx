@@ -64,7 +64,9 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             onChange={(value) => updateCell(cell.id, value)}
           />
         </Resizable>
-        {bundle && (
+        {!bundle || bundle.loading ? (
+          <div>Loading...</div>
+        ) : (
           <CodePreview
             code={bundle.code && bundle.code}
             bundlingStatus={bundle.err}
