@@ -1,6 +1,5 @@
 import { ActionType } from "../action-types";
-import { CellTypes , CellDirection } from "../cell.interface";
-
+import { CellTypes, CellDirection } from "../cell.interface";
 
 export interface MoveCellAction {
   type: ActionType.MOVE_CELL;
@@ -31,8 +30,28 @@ export interface UpdateCellAction {
   };
 }
 
+export interface BundleStartAction {
+  type: ActionType.BUNDLE_START;
+  payload: {
+    cellId: string;
+  };
+}
+
+export interface BundleCompleteAction {
+  type: ActionType.BUNDLE_COMPLETE;
+  payload: {
+    cellId: string;
+    bundle: {
+      code: string;
+      err: string;
+    };
+  };
+}
+
 export type Action =
   | MoveCellAction
   | DeleteCellAction
   | InsertCellAfterAction
-  | UpdateCellAction;
+  | UpdateCellAction
+  | BundleStartAction
+  | BundleCompleteAction;
