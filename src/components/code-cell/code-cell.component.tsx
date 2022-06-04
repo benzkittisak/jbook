@@ -35,16 +35,17 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   const cumulativeCode = useTypedSelector((state) => {
     const { data, order } = state.cells || {};
 
-    const orderedCells = order && order.map(
-      (id: string) => data && data[id]
-    );
+    const orderedCells = order && order.map((id: string) => data && data[id]);
 
     const cumulativeCode = [
       `
         const show = (value) => {
-          document.querySelector('#root').innerHTML = value;
+          if(typeof value === 'object'){
+            document.querySelector('#root').innerHTML = JSON.stringify(value , null , 4);
+          } else 
+            document.querySelector('#root').innerHTML = value;
         }
-      `
+      `,
     ];
 
     if (orderedCells) {
@@ -60,7 +61,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
 
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cumulativeCode.join('\n'));
+      createBundle(cell.id, cumulativeCode.join("\n"));
       return;
     }
     const timer = setTimeout(async () => {
@@ -69,7 +70,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
       // setError(output?.err as string);
 
       // Use Redux
-      createBundle(cell.id, cumulativeCode.join('\n'));
+      createBundle(cell.id, cumulativeCode.join("\n"));
     }, 750);
 
     return () => {
@@ -77,7 +78,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cumulativeCode.join('\n') , cell.id, createBundle]);
+  }, [cumulativeCode.join("\n"), cell.id, createBundle]);
 
   return (
     <Resizable direction="vertical">
