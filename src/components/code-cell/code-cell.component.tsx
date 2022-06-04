@@ -5,11 +5,13 @@ import { useEffect } from "react";
 import CodeEditor from "../code-editor/code-editor.component";
 import CodePreview from "../code-preview/code-preview.component";
 import Resizable from "../resizable/resizable.component";
+import ProgressBar from "../progress/progress-bar.component";
 
 import { Cell } from "../../redux";
 import { useActions } from "../../hooks/use-actions";
 import { useTypedSelector } from "../../hooks";
-import ProgressBar from "../progress/progress-bar.component";
+
+import "./code-cell.style.scss";
 
 interface CodeCellProps {
   cell: Cell;
@@ -29,9 +31,30 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   );
   // console.log(bundle);
 
+  // Cumulative Code
+  const cumulativeCode = useTypedSelector((state) => {
+    const { data, order } = state.cells || {};
+
+    const orderedCells = order && order.map(
+      (id: string) => data && data[id]
+    );
+
+    const cumulativeCode = [];
+
+    if (orderedCells) {
+      for (let c of orderedCells) {
+        if (c && c.type === "code") {
+          cumulativeCode.push(c.content);
+        }
+        if (c && c.id === cell.id) break;
+      }
+    }
+    return cumulativeCode;
+  });
+
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode.join('\n'));
       return;
     }
     const timer = setTimeout(async () => {
@@ -40,7 +63,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
       // setError(output?.err as string);
 
       // Use Redux
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode.join('\n'));
     }, 750);
 
     return () => {
@@ -48,7 +71,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cell.content, cell.id, createBundle]);
+  }, [cumulativeCode.join('\n') , cell.id, createBundle]);
 
   return (
     <Resizable direction="vertical">
@@ -65,14 +88,16 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             onChange={(value) => updateCell(cell.id, value)}
           />
         </Resizable>
-        {!bundle || bundle.loading ? (
-          <ProgressBar />
-        ) : (
-          <CodePreview
-            code={bundle.code && bundle.code}
-            bundlingStatus={bundle.err}
-          />
-        )}
+        <div className="progress-wrapper">
+          {!bundle || bundle.loading ? (
+            <ProgressBar />
+          ) : (
+            <CodePreview
+              code={bundle.code && bundle.code}
+              bundlingStatus={bundle.err}
+            />
+          )}
+        </div>
       </div>
     </Resizable>
   );
