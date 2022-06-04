@@ -9,6 +9,7 @@ import Resizable from "../resizable/resizable.component";
 import { Cell } from "../../redux";
 import { useActions } from "../../hooks/use-actions";
 import { useTypedSelector } from "../../hooks";
+import ProgressBar from "../progress/progress-bar.component";
 
 interface CodeCellProps {
   cell: Cell;
@@ -65,7 +66,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
           />
         </Resizable>
         {!bundle || bundle.loading ? (
-          <div>Loading...</div>
+          <ProgressBar />
         ) : (
           <CodePreview
             code={bundle.code && bundle.code}
