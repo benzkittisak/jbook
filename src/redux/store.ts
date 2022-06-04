@@ -24,4 +24,4 @@ store.dispatch({
     }
 })
 
-// console.log(store.getState().cells);
+console.log(store.getState());
