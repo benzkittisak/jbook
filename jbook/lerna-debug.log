@@ -1,0 +1,6 @@
+32 error Error: Command failed with exit code 128: git add -- packages/local-client/package.json packages/local-api/package.json packages/local-api/package-lock.json packages/cli/package.json packages/cli/package-lock.json lerna.json
+32 error fatal: Pathspec 'packages/local-client/package.json' is in submodule 'jbook/packages/local-client'
+32 error     at makeError (/usr/local/lib/node_modules/lerna/node_modules/execa/lib/error.js:60:11)
+32 error     at handlePromise (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:118:26)
+32 error     at processTicksAndRejections (node:internal/process/task_queues:96:5)
+32 error     at async Promise.all (index 0)

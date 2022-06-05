@@ -13,17 +13,17 @@
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
-    "typescript": "^4.7.3",
-    "nodemon": "^2.0.16"
+    "nodemon": "^2.0.16",
+    "typescript": "^4.7.3"
   },
   "scripts": {
     "start": "tsc --watch --preserveWatchOutput",
     "prepublishOnly": "tsc"
   },
   "dependencies": {
+    "@jsnote-kp/local-client": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.18.1",
-    "http-proxy-middleware": "^2.0.6",
-    "@jsnote-kp/local-client": "^0.1.0"
+    "http-proxy-middleware": "^2.0.6"
   }
 }
