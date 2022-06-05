@@ -1,10 +1,10 @@
 {
-  "name": "cli",
+  "name": "jsnote-kp",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
     "commander": "^9.3.0",
-    "local-api": "^1.0.0"
+    "@jsnote-kp/local-api": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.39",
