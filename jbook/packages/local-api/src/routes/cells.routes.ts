@@ -22,20 +22,23 @@ export const createCellsRouter = (filename: string, dir: string) => {
       // Read the file
 
       const result = await fs.readFile(fullPath, { encoding: "utf8" });
+      
       res.send(JSON.parse(result));
-    } catch (error) {
+    } catch (error:any) {
       //  If red throw an error
       // Inspect the error, see if it says that the file doesn't exist'
       // Parse a list of cells out of it
       // Send list of cells back to the browser
       if (error instanceof Error) {
-        if (error.name === "ENOENT") {
+        if (error.message.includes("ENOENT")) {
           await fs.writeFile(fullPath, "[]", "utf-8");
-          res.json([]);
+          res.send([]);
         } else {
           throw error;
         }
+        
       }
+      
     }
   });
 
@@ -47,7 +50,7 @@ export const createCellsRouter = (filename: string, dir: string) => {
 
     // Write the cells into the file
     await fs.writeFile(fullPath, JSON.stringify(cells), "utf-8");
-    res.send({ state: "ok" });
+    res.send({ status: "ok" });
   });
 
   return router;
